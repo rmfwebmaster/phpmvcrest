@@ -1,0 +1,68 @@
+<div class="row">
+    <div class="col-md-4 col-lg-4"></div>
+    <div class="col-md-4 col-lg-4">
+        <form id="login" name="login" method="post" action="">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" minlength="7" class="form-control" id="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" minlength="5" id="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-default btn-block">Entrar</button>
+        </form>
+
+        <h1></h1>
+
+        <div class="row">
+            <div class="col-md-12 col-lg-12 text-center">
+                <div id="msg"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-4"></div>
+</div>
+
+<script type="text/javascript">
+    $('#login').submit(function(event){
+        event.preventDefault();
+
+        var dados = $( this ).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8000/dologin",
+            data: dados
+        })
+            .done(function(data) {
+                // console.log(data);
+                // return false;
+
+                if(data == 1){
+                    $(".form-group").removeClass("has-error");
+                    $(".form-group").addClass("has-success");
+
+                    window.location="admin";
+                }else{
+                    var erros = "";
+                    var field;
+
+                    $(".form-group").removeClass("has-error");
+
+                    $.each( JSON.parse(data), function( key, val ) {
+                        erros = erros + "<small>"+val+"</small><br>";
+                        field = key.split(".");
+
+                        $("#"+field[0]).parent().removeClass('has-error').addClass('has-error');
+                    });
+
+                    $("#msg").html("<div class='alert alert-danger' role='alert'><strong>Erros</strong><br>"+erros+"</div>").fadeIn();
+                }
+            })
+            .fail(function(data) {
+                alert( "error" );
+                return false;
+            })
+    });
+</script>

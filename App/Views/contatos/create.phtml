@@ -1,0 +1,97 @@
+<div class="page-header">
+    <h1>Gerenciar Contatos <small>Novo contatos</small></h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 text-center">
+        <a href="/contatos" type="button" class="btn btn-default">Gerenciar Contatos</a>
+    </div>
+</div>
+
+<h1></h1>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 text-center">
+        <div id="msg"></div>
+    </div>
+</div>
+
+<h1></h1>
+
+<div class="row">
+    <div class="col-md-3 col-lg-3"></div>
+    <div class="col-md-6 col-lg-6">
+        <form id="contatoscreate" name="contatoscreate" method="POST" role="form" action="">
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input id="nome" name="nome" type="text" minlength="3" class="form-control" placeholder="Digite o nome do contato" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" minlength="7" id="email" name="email" placeholder="Digite o e-mail do contato" required>
+            </div>
+            <div class="form-group">
+                <label for="celular">Celular</label>
+                <input type="text" class="form-control" minlength="15" maxlength="15" id="celular" name="celular" placeholder="(XX) XXXXX-XXXX" required>
+            </div>
+            <div class="form-group">
+                <label for="sexo">Sexo</label>
+                <select id="sexo" name="sexo" class="form-control">
+                    <option value="Masculino" selected>Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="estadocivil">Estado Civil</label>
+                <select id="estadocivil" name="estadocivil" class="form-control">
+                    <option value="Casado(a)" selected>Casado(a)</option>
+                    <option value="Solteiro(a)">Solteiro(a)</option>
+                </select>
+            </div>
+
+            <button id="save-button" type="Submit" class="btn btn-primary btn-block">Cadastrar Contato</button>
+        </form>
+    </div>
+    <div class="col-md-3 col-lg-3"></div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function () {
+        $("#celular").mask('(00) 00000-0000');
+    });
+
+    $('#contatoscreate').submit(function(event){
+        event.preventDefault();
+
+        var dados = $( this ).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8000/api/contatossave",
+            data: dados
+        })
+        .done(function(data) {
+            if(data == 1){
+                $(".form-group").removeClass("has-error");
+                $("#contatoscreate")[0].reset();
+                $("#msg").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>Contato cadastrado com sucesso</strong></div>").fadeIn();
+            }else{
+                var erros = "";
+                var field;
+
+                $.each( JSON.parse(data), function( key, val ) {
+                    erros = erros + "<p>"+val+"</p>";
+                    field = key.split(".");
+
+                    $("#"+field[0]).parent().removeClass('has-error').addClass('has-error');
+                });
+
+                $("#msg").html("<div class='alert alert-danger' role='alert'><strong>Erros</strong>"+erros+"</div>").fadeIn();
+            }
+        })
+        .fail(function(data) {
+            alert( "error" );
+            return false;
+        })
+    });
+</script>

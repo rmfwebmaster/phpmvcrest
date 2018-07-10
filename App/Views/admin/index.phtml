@@ -1,0 +1,122 @@
+<div class="page-header">
+    <h1>Dashboard <small>Gráficos Úteis</small></h1>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="panel panel-info"> <div class="panel-heading"> <h3 class="panel-title text-center">Registros</h3> </div> <div class="panel-body text-center"> <?= $this->view->contatos['TOTAL'] ?> </div> </div>
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="panel panel-success"> <div class="panel-heading"> <h3 class="panel-title text-center">Homens</h3> </div> <div class="panel-body text-center"> <?= $this->view->contatos['TOTAL_MEN'] ?> </div> </div>
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="panel panel-info"> <div class="panel-heading"> <h3 class="panel-title text-center">Mulheres</h3> </div> <div class="panel-body text-center"> <?= $this->view->contatos['TOTAL_WOMEN'] ?> </div> </div>
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="panel panel-success"> <div class="panel-heading"> <h3 class="panel-title text-center">Casados</h3> </div> <div class="panel-body text-center"> <?= $this->view->contatos['TOTAL_MARRIED'] ?> </div> </div>
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="panel panel-info"> <div class="panel-heading"> <h3 class="panel-title text-center">Solteiros</h3> </div> <div class="panel-body text-center"> <?= $this->view->contatos['TOTAL_SINGLES'] ?> </div> </div>
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="panel panel-success"> <div class="panel-heading"> <h3 class="panel-title text-center">Adicionados Hoje</h3> </div> <div class="panel-body text-center"> <?= $this->view->contatos['TOTAL_TODAY'] ?> </div> </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 col-lg-4">
+        <h1></h1>
+        <canvas id="myChart" width="400" height="200"></canvas>
+        <h1></h1>
+    </div>
+    <div class="col-md-4 col-lg-4">
+        <h1></h1>
+        <canvas id="myChart2" width="400" height="200"></canvas>
+        <h1></h1>
+    </div>
+    <div class="col-md-4 col-lg-4">
+        <h1></h1>
+        <canvas id="myChart3" width="400" height="200"></canvas>
+        <h1></h1>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Total", "Homens", "Mulheres", "Casados", "Solteiros"],
+            datasets: [{
+                label: '# de Registros',
+                data: [<?php echo $this->view->contatos['TOTAL']?>, <?php echo $this->view->contatos['TOTAL_MEN']?>, <?php echo $this->view->contatos['TOTAL_WOMEN']?>, <?php echo $this->view->contatos['TOTAL_MARRIED']?>, <?php echo $this->view->contatos['TOTAL_SINGLES']?>],
+                backgroundColor: [
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255,99,132,1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+
+    var ctx2 = document.getElementById("myChart2");
+    var myChart2 = new Chart(ctx2,{
+        type: 'pie',
+        data: {
+            labels: ["Homens", "Mulheres"],
+            datasets: [{
+                data: [<?php echo $this->view->contatos['TOTAL_MEN']?>, <?php echo $this->view->contatos['TOTAL_WOMEN']?>],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255,99,132,1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    var ctx3 = document.getElementById("myChart3");
+    var myChart3 = new Chart(ctx3,{
+        type: 'pie',
+        data: {
+            labels: ["Casados", "Solteiros"],
+            datasets: [{
+                data: [<?php echo $this->view->contatos['TOTAL_MARRIED']?>, <?php echo $this->view->contatos['TOTAL_SINGLES']?>],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+
+
+</script>

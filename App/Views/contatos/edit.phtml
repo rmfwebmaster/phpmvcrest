@@ -1,0 +1,150 @@
+<div class="page-header">
+    <h1>Gerenciar Contatos <small>Editar contato</small></h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 text-center">
+        <a href="/contatos" type="button" class="btn btn-default">Gerenciar Contatos</a>
+    </div>
+</div>
+
+<h1></h1>
+
+<div class="row">
+    <div id="loadContatos">
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 text-center">
+        <div id="msg"></div>
+    </div>
+</div>
+
+<h1></h1>
+
+<div id="formulario">
+    <div class="row">
+        <div class="col-md-3 col-lg-3"></div>
+        <div class="col-md-6 col-lg-6">
+            <form id="contatosedit" name="contatosedit" method="POST" role="form" action="">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input id="nome" name="nome" type="text" minlength="3" class="form-control" placeholder="Digite o nome do contato" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" minlength="7" id="email" name="email" placeholder="Digite o e-mail do contato" required>
+                </div>
+                <div class="form-group">
+                    <label for="celular">Celular</label>
+                    <input type="text" class="form-control" minlength="15" maxlength="15" id="celular" name="celular" placeholder="(XX) XXXXX-XXXX" required>
+                </div>
+                <div class="form-group">
+                    <label for="sexo">Sexo</label>
+                    <select id="sexo" name="sexo" class="form-control">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="estadocivil">Estado Civil</label>
+                    <select id="estadocivil" name="estadocivil" class="form-control">
+                    </select>
+                </div>
+
+                <button id="edit-button" type="Submit" class="btn btn-primary btn-block">Editar Contato</button>
+            </form>
+        </div>
+        <div class="col-md-3 col-lg-3"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function(){
+        loadContatos();
+        $("#celular").mask('(00) 00000-0000');
+    });
+
+    function loadContatos() {
+        $("#loadContatos").html("<div class='text-center'>carregando...</div>");
+
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:8000/api/contatos/<?= $this->view->contatoId ?>/edit",
+            dataType: "json"
+        })
+
+            .done(function(data) {
+
+                $("#loadContatos").html("");
+
+                if (data == false) {
+                    $("#formulario").html("");
+                    $("#loadContatos").html("<div class='col-md-12 col-lg-12'><p class='lead text-center'>Contato inexistente</p></div>");
+                    return false;
+                }
+
+                $("#nome").attr('value', data.nome);
+                $("#email").attr('value', data.email);
+                $("#celular").attr('value', data.celular);
+
+                if (data.sexo == "Masculino") {
+                    $("#sexo").text("");
+                    $("#sexo").append("<option value='Masculino' selected>Masculino</option><option value='Feminino'>Feminino</option>");
+                } else {
+                    $("#sexo").text("");
+                    $("#sexo").append("<option value='Masculino'>Masculino</option><option value='Feminino' selected>Feminino</option>");
+                }
+
+                if (data.estadocivil == "Casado(a)") {
+                    $("#estadocivil").text("");
+                    $("#estadocivil").append("<option value='Casado(a)' selected>Casado(a)</option><option value='Solteiro(a)'>Solteiro(a)</option>");
+                } else {
+                    $("#estadocivil").text("");
+                    $("#estadocivil").append("<option value='Casado(a)'>Casado(a)</option><option value='Solteiro(a)' selected>Solteiro(a)</option>");
+                }
+            })
+
+            .fail(function(data) {
+                alert( "error" );
+                return false;
+            })
+    }
+
+    $('#contatosedit').submit(function(event){
+        event.preventDefault();
+
+        var dados = $( this ).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8000/api/contatos/<?= $this->view->contatoId ?>/update",
+            data: dados
+        })
+            .done(function(data) {
+                if(data == 1){
+                    loadContatos();
+                    $("#msg").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>Contato editado com sucesso</strong></div>").fadeIn();
+                }else{
+                    var erros = "";
+                    var field;
+
+                    $.each( JSON.parse(data), function( key, val ) {
+                        erros = erros + "<p>"+val+"</p>";
+                        field = key.split(".");
+
+                        $("#"+field[0]).parent().removeClass('has-error').addClass('has-error');
+                    });
+
+                    $("#msg").html("<div class='alert alert-danger' role='alert'><strong>Erros</strong>"+erros+"</div>").fadeIn();
+
+                }
+            })
+            .fail(function(data) {
+                alert( "error" );
+                return false;
+            })
+    });
+</script>
+
+

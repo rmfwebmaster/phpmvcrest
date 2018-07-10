@@ -1,0 +1,110 @@
+<div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Deletar Contato</h4>
+            </div>
+            <div class="modal-body">
+                Você deseja mesmo deletar o contato <strong><span id="contato"></span></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
+                <button id="delete-modal" type="button" class="btn btn-primary">Sim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-header">
+    <h1>Gerenciar Contatos <small>Lista de contatos</small></h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 text-center">
+        <a href="/contatos/create" type="button" class="btn btn-primary">Novo Contato</a>
+        <button id="refresh-button" type="button" class="btn btn-default">Recarregar Lista</button>
+    </div>
+</div>
+
+<h1></h1>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 text-center">
+        <div id="msg"></div>
+    </div>
+</div>
+
+<div class="row">
+    <div id="loadContatos">
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function(){
+        loadContatos();
+    });
+
+    function passaDados(obj) {
+        var codigo = $(obj).attr('codigo');
+        var contato = $(obj).attr('contato');
+
+        $("#contato").text(contato);
+        $("#delete-modal").attr("codigo",codigo);
+    }
+
+    function loadContatos() {
+        $("#loadContatos").html("<div class='text-center'>carregando...</div>");
+
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:8000/api/contatos",
+            dataType: "json"
+        })
+
+            .done(function(data) {
+
+                $("#loadContatos").html("");
+
+                if(data.length == 0){
+                    $("#loadContatos").html("<div class='col-md-12 col-lg-12'><p class='lead text-center'>Nenhum registro encontrado</p></div>");
+                    return false;
+                }
+
+                $.each( data, function( key, val ) {
+                    $("#loadContatos").append("<div class='col-sm-6 col-md-4 col-lg-4' id='" + key + "'><table class='table table-bordered'><tbody><tr><td><strong>Nome: </strong>" + val.nome + "</td></tr><tr><td><strong>E-mail: </strong>" + val.email + "</td></tr><tr><td><strong>Celular: </strong>" + val.celular + "</td></tr><tr><td><strong>Sexo: </strong>" + val.sexo + "</td></tr><tr><td><strong>Estado Civil: </strong>" + val.estadocivil + "</td></tr><tr><td><a href='/contatos/" + val.id + "/edit' type='button' class='btn btn-primary btn-xs'>Editar Contato</a> | <button id='delete-button' codigo='" + val.id + "' contato='" + val.nome + "' type='button' class='btn btn-default btn-xs' data-toggle='modal' data-target='#delModal' onclick='passaDados(this)'>Deletar Contato</button></td></tr></tbody></table></div>");
+                });
+
+            })
+
+            .fail(function(data) {
+                alert( "error" );
+                return false;
+            })
+    }
+
+    $("#delete-modal").on("click", function () {
+       var cod_contato = $("#delete-modal").attr("codigo");
+
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:8000/api/contatos/"+cod_contato+"/delete",
+        })
+
+            .done(function(data) {
+                $('#delModal').modal('hide');
+                loadContatos();
+                $("#msg").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>Contato deletado com sucesso</strong></div>").fadeIn();
+            })
+
+            .fail(function(data) {
+                alert( "error" );
+                return false;
+            })
+    });
+
+    $( "#refresh-button" ).on( "click", loadContatos );
+</script>
+
+
